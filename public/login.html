@@ -1,0 +1,30 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel=stylesheet type="text/css" href="css/form.css" />
+	<link rel=stylesheet type="text/css" href="css/login.css" />
+	<title>Login - ESXi Monitor</title>
+	<script src="js/lib.js"></script>
+	<script src="js/login.js"></script>
+</head>
+<body>
+
+[<a href="index.html">Monitor Top</a>]
+
+<fieldset class="group" id="login">
+<legend>Connect</legend>
+  <div id="message"></div>
+  <form id="login_form" method="POST" action="login.cgi">
+    <table>
+      <tr><td>Host:</td><td><span id="host_name">hostname</span></td></tr>
+      <tr><td>User:</td><td><input type="text" name="user" value="" /></td></tr>
+      <tr><td>Password:</td><td><input type="password" name="pass" value="" /> </td></tr>
+    </table>
+
+    <button type="submit" size="100" value="login" id="connect_button" />Connect</button>
+  </form>
+</fieldset>
+
+</body>
+</html>
+

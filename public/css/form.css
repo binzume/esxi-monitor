@@ -1,0 +1,103 @@
+input[type="text"], input[type="password"] {
+	margin: 2pt;
+	padding: 0px 2pt;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	height: 1.8em;
+}
+
+input[type="checkbox"] {
+}
+
+select {
+	margin: 2pt;
+	padding: 0px 2pt;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	height: 1.8em;
+}
+
+label {
+	user-select: none;
+	-webkit-user-select: none;
+}
+textarea {
+	width: 400pt;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	min-height: 5em;
+	resize: vertical;
+}
+button {
+	margin: 2pt;
+	min-width: 6em;
+	min-height: 1.8em;
+	border-radius: 3px;
+	font-weight: bold;
+	border: 1px solid #bbb;
+	background-color: #ccc;
+	background: -webkit-linear-gradient(top, #eee, #ddd 10%, #bbb);
+	background: -moz-linear-gradient(top, #eee, #ddd 10%, #bbb);
+	background: linear-gradient(to bottom, #eee, #ddd 10%, #bbb);
+	user-select: none;
+	-webkit-user-select: none;
+}
+.attach_left {
+	margin-left: -1px;
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
+.attach_right {
+	margin-right: 0px !important;;
+	border-top-right-radius: 0px !important;;
+	border-bottom-right-radius: 0px !important;;
+}
+.attach_right + * {
+	margin-left: -1px !important;
+	border-top-left-radius: 0px !important;
+	border-bottom-left-radius: 0px !important;
+}
+
+
+button:active {
+	background: -webkit-linear-gradient(top, #bbb, #ddd 40%, #eee);
+	background: linear-gradient(to bottom, #bbb, #ddd 40%, #eee);
+}
+button:hover {
+	box-shadow: 0px 2px 5px 1px #7af;
+}
+
+
+button.submit {
+	border: #8ad;
+	background-color: #5af;
+	background: -webkit-linear-gradient(top, #7cf, #5af 10%, #68c);
+	background: linear-gradient(to bottom, #7cf, #5af 10%, #68c);
+}
+button.submit:active {
+	background: -webkit-linear-gradient(top, #68c, #5af 40%, #7cf);
+	background: linear-gradient(to bottom, #68c, #5af 40%, #7cf);
+}
+
+button.careful {
+	color: white;
+	border: #da8;
+	background-color: #d44;
+	background: -webkit-linear-gradient(top, #f88, #d44 10%, #922);
+	background: linear-gradient(to bottom, #f88, #d44 10%, #922);
+}
+button.careful:active {
+	background: -webkit-linear-gradient(top, #922, #d44 40%, #f88);
+	background: linear-gradient(to bottom, #922, #d44 40%, #f88);
+}
+
+fieldset.group {
+	border: 2px solid #bbb;
+	border-radius: 5px;
+}
+
+fieldset.group legend {
+	margin-left: 10pt;
+	font-weight: bold;
+}
+

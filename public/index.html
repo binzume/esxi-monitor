@@ -1,0 +1,85 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel=stylesheet type="text/css" href="css/form.css" />
+	<link rel=stylesheet type="text/css" href="css/list.css" />
+	<link rel=stylesheet type="text/css" href="css/layout_sidemenu.css" />
+	<link rel=stylesheet type="text/css" href="css/monitor.css" />
+	<title>ESXi Monitor</title>
+	<script src="js/lib.js"></script>
+	<script src="js/monitor.js"></script>
+</head>
+<body>
+
+<div id="content">
+
+<div>
+
+<h2>ESXi Monitor</h2>
+
+<div id="error" style="display:none;">ERROR: Please try disconnect and connect.</div>
+
+<a href="login.html">Connect</a>
+<a href="/api/v1/esxi/disconnect">Disconnect</a>
+
+</div>
+
+<div class="menu">
+VMs
+
+<ul class="simple" id="vm_list">
+ <li>vm01</li>
+ <li>vm02</li>
+</ul>
+</div>
+
+<div class="main">
+
+<fieldset class="group">
+<legend id="vm_name">name</legend>
+
+vmid: <span id="vm_id">--</span>
+
+<h3>Summary:</h3>
+<ul class="simple" id="vm_summary">
+ <li>vm_summary</li>
+ <li>hoge</li>
+</ul>
+
+
+<h3>Guest:</h3>
+
+<ul class="simple" id="vm_guest">
+ <li>vm_guest</li>
+ <li>hoge</li>
+</ul>
+
+
+<p>
+<button id="reboot_button" class="submit">Reboot</button>
+<button id="power_off_button" class="careful attach_right">Power Off</button><button id="power_on_button" class="">On</button>
+</p>
+
+
+</fieldset>
+
+</div>
+
+<div class="menu">
+hoge
+
+</div>
+
+
+<div class="footer">
+ESXi Monitor v0.1
+</div>
+
+
+
+</div>
+
+</body>
+</html>
+
+

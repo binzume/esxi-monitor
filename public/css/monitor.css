@@ -1,0 +1,13 @@
+
+.running{
+	color: green;
+}
+
+.stopped{
+	color: red;
+}
+
+
+#error {
+	color:red;
+}

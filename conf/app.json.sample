@@ -1,0 +1,4 @@
+{
+	"esxi_host":"esxi.hoge.example.com",
+	"ssh_port": 22
+}

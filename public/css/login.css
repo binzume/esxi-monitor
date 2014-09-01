@@ -1,0 +1,17 @@
+
+#login{
+	width: 300pt;
+	margin: 2em auto;
+	text-align:center;
+}
+
+#login_form{
+	padding: 1em;
+	margin: 0px auto;
+	text-align:left;
+}
+
+#connect_button {
+	margin-right: 20pt;
+	float:right;
+}

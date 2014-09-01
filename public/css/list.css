@@ -1,0 +1,154 @@
+
+/* simple list */
+ul.simple {
+	border-color: #bbb;
+	border-style: solid;
+	border-width: 0px 0px 1px 0px;
+	margin: 0px;
+	padding: 0px;
+}
+ul.simple li {
+	border-color: #bbb;
+	border-style: solid;
+	border-width: 1px 0px 0px 0px;
+	list-style-type: none;
+	padding: 3px 10px;
+	margin: 0px;
+}
+ul.simple li:nth-child(2n) {
+	background-color: #fafafa;
+}
+
+ul.simple li:nth-child(2n+1) {
+	background-color: #f5f5f5;
+}
+
+ul.simple li:nth-child(2n):hover {
+	background-color: #ffffdd;
+}
+
+ul.simple li:nth-child(2n+1):hover {
+	background-color: #f5f5dd;
+}
+
+
+/* menulist */
+ul.menubar li {
+	display:inline-block;
+	padding: 0.3em 1em;
+	margin:0px;
+	font-weight:bold;
+	color: black;
+	text-shadow: 1px 1px 2px white;
+	border-style:solid;
+	border-width: 0 1px 0 0;
+	border-color: #888;
+
+}
+ul.menubar li.sel {
+	color: white;
+	text-shadow: 1px 1px 2px black;
+	background-color:#888;
+    background: -moz-linear-gradient(top, #444,
+           #555 40%,
+           #666);
+    background: -webkit-gradient(linear,left top,left bottom, from(#444),  
+           color-stop(0.4, #555),
+           to(#666));
+}
+ul.menubar li a{
+	text-decoration:underline;
+	cursor:pointer;
+	color:black;
+}
+ul.menubar li.sel a{
+	text-decoration:underline;
+	cursor:pointer;
+	color:white;
+}
+
+/* tabs */
+ul.tab{
+	margin: 10px 0 0 0;
+	border-style: none;
+	border-color: #888;
+	border-width: 0px 0px 2px 0px;
+	padding: 0;
+}
+
+ul.tab:before{
+	display: inline-block;
+	content: "";
+	width: 1em;
+}
+
+ul.tab:after{
+	display: block;
+	padding: 0;
+	height: 12px;
+	content: "";
+
+	-webkit-border-top-left-radius: 4px;
+	-webkit-border-top-right-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+
+	background-color: #aaa;
+	background: -moz-linear-gradient(top, #aaa, #fff);
+	background: -webkit-gradient(linear,left top,left bottom, from(#aaa), to(#fff));
+
+}
+
+ul.tab li {
+	display:inline-block;
+	padding: 0.3em 1em;
+	margin: 0px;
+	font-weight: bold;
+
+	background-color: #ccc;
+	background: -moz-linear-gradient(top, #ddd,
+		#ccc 40%,
+		#ddd 70%,
+		#fff);
+	background: -webkit-gradient(linear,left top,left bottom, from(#ddd),  
+		color-stop(0.4, #ccc),
+		color-stop(0.7, #ddd),
+		to(#fff));
+
+	-webkit-border-top-left-radius: 4px;
+	-webkit-border-top-right-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+
+	color: black;
+	text-shadow: 1px 1px 2px white;
+	border-style:solid;
+	border-width: 0 1px 0 0;
+	border-color: #888;
+}
+
+ul.tab li.sel {
+	color: white;
+	text-shadow: 1px 1px 2px black;
+	background-color:#888;
+	background: -moz-linear-gradient(top, #444,
+           #666 40%,
+           #aaa);
+	background: -webkit-gradient(linear,left top,left bottom, from(#444),  
+           color-stop(0.4, #666),
+           to(#aaa));
+}
+
+ul.tab li a{
+	text-decoration:none;
+	cursor:pointer;
+	color:black;
+}
+
+ul.tab li.sel a{
+	text-decoration:none;
+	cursor:pointer;
+	color:white;
+}
+
+

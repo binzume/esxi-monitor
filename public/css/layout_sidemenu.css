@@ -1,0 +1,52 @@
+body {
+	margin: 0px;
+	padding: 0px;
+}
+
+#content {
+	width: 95%;
+	max-width: 1000px;
+	margin: 0px auto;
+	z-index: 0;
+}
+
+#content .header {
+}
+#content .footer {
+	clear: both;
+}
+
+/* main content */
+#content .main {
+	float: left;
+	width:100%;
+	min-width: 500px;
+	margin: 0px -12em 0px 0px;
+}
+
+#content .main>* {
+	margin-right:12em;
+}
+
+/* right menu */
+#content .menu {
+	position:relative;
+	z-index: 9;
+	width:11.5em;
+	float:right;
+	margin: 0 0 0 0em;
+	box-sizing: border-box;
+}
+
+@media screen and (max-width: 600px), screen and (max-device-width: 400px) { /* and (orientation: portrait) */
+    #content .menu {
+        width: 100%;
+    }
+	#content .main {
+		min-width: 320px;
+		margin: 0px;
+	}
+	#content .main>* {
+		margin-right:0px;
+	}
+}
