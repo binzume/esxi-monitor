@@ -7,7 +7,6 @@ function check_connected(f) {
 
 	getJson(apiUrl + "esxi/status",function(result) {
 		if (result.status=='ok') {
-			token = result.token;
 			if (f) {
 				f(result);
 			}
@@ -39,7 +38,12 @@ function load_vm_data(vmid) {
 
 window.addEventListener('load',(function(e){
 
-	check_connected(null);
+	check_connected(function(result){
+		token = result.token;
+		if (result.connected == false) {
+			location.href="login.html";
+		}
+	});
 
 	document.getElementById('reboot_button').addEventListener('click',(function(e){
 		var vmid = document.getElementById('vm_id').innerText;

@@ -1,13 +1,14 @@
 # coding: utf-8
 
 require 'net/ssh'
-require 'kconv'
+require 'thread'
 
 class ESXi
   attr_reader :ssh
 
   def initialize opts
     @opts = opts
+    @m = Mutex.new
   end
 
   def host
@@ -19,40 +20,46 @@ class ESXi
   end
 
   def connect
-    @ssh = Net::SSH.start(@opts[:host], @opts[:user], {:password => @opts[:password]})
+    @m.synchronize {
+      @ssh = Net::SSH.start(@opts[:host], @opts[:user], {:password => @opts[:password]})
+    }
   end
 
   def allvms
-    @ssh.exec!('vim-cmd vmsvc/getallvms').lines[1..-1].map{|v|
+    exec!('vim-cmd vmsvc/getallvms').lines[1..-1].map{|v|
       Hash[*[:id, :name, :file, :guest_os, :version, :annotation].zip(v.split(/\s\s+/)).flatten]
     }
   end
 
   def summary vmid
-    result = @ssh.exec!('vim-cmd vmsvc/get.summary ' + vmid)
+    result = exec!('vim-cmd vmsvc/get.summary ' + vmid)
     parse(result.sub(/\A[^(]+/,''))
   end
 
   def power_off vmid
-    @ssh.exec!('vim-cmd vmsvc/power.off ' + vmid)
+    exec!('vim-cmd vmsvc/power.off ' + vmid)
   end
 
   def power_on vmid
-    @ssh.exec!('vim-cmd vmsvc/power.on ' + vmid)
+    exec!('vim-cmd vmsvc/power.on ' + vmid)
   end
 
   def reboot vmid
-    @ssh.exec!('vim-cmd vmsvc/power.reboot ' + vmid)
+    exec!('vim-cmd vmsvc/power.reboot ' + vmid)
+  end
+
+  def shutdown vmid
+    exec!('vim-cmd vmsvc/power.shutdown ' + vmid)
   end
 
   def guest vmid
-    result = @ssh.exec!('vim-cmd vmsvc/get.guest ' + vmid)
+    result = exec!('vim-cmd vmsvc/get.guest ' + vmid)
     #puts result.sub(/\A[^(]+/,'')
     parse(result.sub(/\A[^(]+/,''))
   end
 
   def vm_message vmid
-    @ssh.exec!('vim-cmd vmsvc/message' + vmid)
+    exec!('vim-cmd vmsvc/message' + vmid)
   end
 
   def close
@@ -81,6 +88,12 @@ class ESXi
     end
     str.sub!(/\A\s*\]/,'')
     r
+  end
+
+  def exec!(command)
+    @m.synchronize {
+      @ssh.exec!(command)
+    }
   end
 
   def parse str
