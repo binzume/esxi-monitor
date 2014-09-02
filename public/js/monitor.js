@@ -40,7 +40,9 @@ window.addEventListener('load',(function(e){
 
 	check_connected(function(result){
 		token = result.token;
-		if (result.connected == false) {
+		if (result.connected) {
+		    document.getElementById('login_user').innerText = result.user + " : " + result.host;
+		} else {
 			location.href="login.html";
 		}
 	});

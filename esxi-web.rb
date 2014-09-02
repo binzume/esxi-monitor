@@ -101,7 +101,7 @@ class ESXiMonitorWeb < Sinatra::Base
       ESXI.instance = ESXi.new({
         :host => settings.conf['esxi_host'],
         :user => params['user'],
-        :password => params['pass'],
+        :password => params['password'],
       })
       ESXI.instance.connect
     rescue Exception => e
@@ -116,7 +116,8 @@ class ESXiMonitorWeb < Sinatra::Base
 
   get '/api/v1/esxi/status' do
     content_type :json
-    {:status => 'ok', :host => settings.conf['esxi_host'], :connected => (ESXI.instance != nil), :token => settings.token}.to_json
+    user = ESXI.instance ? ESXI.instance.user : "";
+    {:status => 'ok', :host => settings.conf['esxi_host'], :connected => (ESXI.instance != nil), :user => user, :token => settings.token}.to_json
   end
 
   get '/*' do
