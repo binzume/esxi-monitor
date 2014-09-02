@@ -54,3 +54,41 @@ function element(tag, values, attr) {
 	}
 	return e;
 }
+
+
+function bindObj(o, f) {
+	return function() {return f.apply(o, arguments)};
+}
+
+
+function Dialog(elem, cancel) {
+	this.elem = elem;
+    this._oncancel = bindObj(this, this.oncancel);
+
+	if (cancel) {
+		cancel.addEventListener('click', this._oncancel,false);
+	}
+}
+
+Dialog.prototype.show = function() {
+	this.elem.style.display = "block";
+	var f = this._oncancel;
+	setTimeout(function() {
+		document.body.addEventListener('click', f, false);
+	 }, 1);
+	return this;
+}
+
+Dialog.prototype.dismiss = function() {
+	this.elem.style.display = "none";
+    document.body.removeEventListener('click', this._oncancel, false);
+	return this;
+}
+
+
+Dialog.prototype.oncancel = function(e) {
+    e.preventDefault();
+    this.dismiss();
+}
+
+

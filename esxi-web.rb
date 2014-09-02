@@ -41,20 +41,39 @@ class ESXiMonitorWeb < Sinatra::Base
     content_type :json
     halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
 
-    {:status=> 'ok', :guest => ESXI.instance.guest(params[:vmid])}.to_json
+    result = ESXI.instance.guest(params[:vmid])
+    if result && result[:_type] == "vim.fault.NotFound"
+      halt 404, {:status => 'error', :message => result["msg"]}.to_json
+    end
+
+    {:status=> 'ok', :guest => result}.to_json
   end
 
   get '/api/v1/vms/:vmid' do
     content_type :json
     halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
 
-    {:status=> 'ok', :guest => ESXI.instance.summary(params[:vmid])}.to_json
+    result = ESXI.instance.summary(params[:vmid])
+    if result && result[:_type] == "vim.fault.NotFound"
+      halt 404, {:status => 'error', :message => result["msg"]}.to_json
+    end
+
+    {:status=> 'ok', :summary => result}.to_json
+  end
+
+  delete '/api/v1/vms/:vmid' do
+    content_type :json
+    halt 403, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
+    halt 403, {:status => 'error', :message => 'bad token'}.to_json if request.env['HTTP_X_CSRFTOKEN'] != settings.token
+
+    puts ESXI.instance.destroy!(params[:vmid])
+
+    {:status=> 'ok'}.to_json
   end
 
   get '/api/v1/vms' do
     content_type :json
     halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
-
 
     {:status=> 'ok', :vms => ESXI.instance.allvms()}.to_json
   end
@@ -65,9 +84,27 @@ class ESXiMonitorWeb < Sinatra::Base
 
     v = request.body.read
     if v == 'on'
+      t = Thread.new do
+        sleep(3)
+        ESXI.instance.fork {|conn|
+          10.times do
+            r = conn.exec!('vim-cmd vmsvc/message ' + params[:vmid])
+            puts r
+            if r =~/^Virtual machine message\s*([^\s:]:+)/
+              puts $1
+              puts conn.exec!("vim-cmd vmsvc/message #{params[:vmid]} #{$1} 2")
+              break
+            end
+            sleep(2)
+          end
+        }
+      end
       puts ESXI.instance.power_on(params[:vmid])
+      t.terminate
     elsif v == 'off'
       ESXI.instance.power_off(params[:vmid])
+    elsif v == 'shutdown'
+      ESXI.instance.shutdown(params[:vmid])
     elsif v == 'reboot'
       ESXI.instance.reboot(params[:vmid])
     else
@@ -76,6 +113,41 @@ class ESXiMonitorWeb < Sinatra::Base
 
     content_type :json
     {:status => '?'}.to_json
+  end
+
+  # copy vm
+  post '/api/v1/vms/:vmid/copy' do
+    halt 403, {:status => 'error', :message => 'bad token'}.to_json if request.env['HTTP_X_CSRFTOKEN'] != settings.token
+    halt 403, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
+    halt 400, {:status => 'error', :message => 'param error: name'}.to_json unless params['name'] && params['name'] =~ /^[\w_-]+$/
+    halt 400, {:status => 'error', :message => 'param error: macaddr'}.to_json unless params['macaddr'] && params['macaddr'] =~ /^[\w:]+$/
+    name = params['name']
+    macaddr = params['macaddr']
+    dir = name
+    srcvmid = params[:vmid]
+
+    esxi = ESXI.instance
+    summary = esxi.summary(srcvmid)
+    if summary["config"]["vmPathName"] =~/\[([^\]]+)\]\s*(.+)/
+      src = "/vmfs/volumes/" + $1 + "/" + $2
+      src_dir = File.dirname(src)
+      dst_dir = '/vmfs/volumes/' + $1 + '/' + dir
+    end
+
+    # FIXME! vmdk name, etc...
+    puts esxi.exec!('rm -r ' + dst_dir) if params['force']
+    puts esxi.exec!('mkdir ' + dst_dir)
+    r = esxi.exec!("vmkfstools -i #{src_dir}/centos64.vmdk -d thin #{dst_dir}/centos64.vmdk")
+    puts r
+    unless r =~/done./
+      halt 500, {:status => 'error', :message => 'vmdk copy failed'}.to_json
+    end
+    puts esxi.exec!("find #{src_dir} -type f ! -name '*.vmdk' ! -name '*.log' ! -name '*.vswp' -exec cp -f {} #{dst_dir} ';'")
+    puts esxi.exec!("sed -i 's/ethernet0.address\s*=\s*\"[^\"]*\"/ethernet0.address = \"#{macaddr}\"/' #{dst_dir}/*.vmx")
+    created_vmid = esxi.exec!("vim-cmd solo/registervm #{dst_dir}/#{File.basename(src)} #{name}")
+
+    content_type :json
+    {:status => 'ok?', :vmid => created_vmid.strip}.to_json
   end
 
   get '/api/v1/esxi/disconnect' do

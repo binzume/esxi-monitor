@@ -14,11 +14,11 @@
 <div id="content">
 
 <header>
-
-<span id="login_user">...</span>
-<a href="login.html">Connect</a>
-<a href="/api/v1/esxi/disconnect">Disconnect</a>
-
+<ul class="menubar">
+<li><span id="login_user">...</span></li>
+<li><a href="login.html">Connect</a></li>
+<li><a href="javascript:disconnect()">Disconnect</a></li>
+</ul>
 </header>
 
 
@@ -32,16 +32,28 @@
 </div>
 
 <div class="menu">
-VMs
+VMs <button id="refresh_button">Reload</button>
 
 <ul class="simple" id="vm_list">
  <li>please reload</li>
  <li>vm01</li>
  <li>vm02</li>
 </ul>
+
 </div>
 
 <div class="main">
+
+
+
+<div id="power_off_dialog" class="dialog">
+ <h3>Power OFF</h3>
+ <button id="shutdown_button" class="">Shutdown</button> <br />
+ <button id="power_off_button" class="careful">Power Off</button> <br />
+ <button id="power_off_dialog_cancel_button">Cancel</button>
+</div>
+
+
 
 <fieldset class="group">
 <legend id="vm_name">name</legend>
@@ -51,7 +63,7 @@ vmid: <span id="vm_id">--</span>
 <h3>Summary:</h3>
 <ul class="simple" id="vm_summary">
  <li>vm_summary</li>
- <li>hoge</li>
+ <li>not implemented...</li>
 </ul>
 
 
@@ -60,13 +72,12 @@ vmid: <span id="vm_id">--</span>
 <ul class="simple" id="vm_guest">
  <li>select a vm from menu.</li>
  <li>vm_guest</li>
- <li>hoge</li>
 </ul>
 
 
 <p>
 <button id="reboot_button" class="submit">Reboot</button>
-<button id="power_off_button" class="careful attach_right">Power Off</button><button id="power_on_button" class="">On</button>
+<button id="dlg_power_off_button" class="careful attach_right">Shutdown...</button><button id="power_on_button" class="">On</button>
 </p>
 
 
@@ -74,17 +85,10 @@ vmid: <span id="vm_id">--</span>
 
 </div>
 
-<div class="menu">
-hoge
-
-</div>
-
 
 <div class="footer">
 <a href="https://github.com/binzume/esxi-monitor">ESXi Monitor</a> v0.1
 </div>
-
-
 
 </div>
 

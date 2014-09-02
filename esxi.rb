@@ -58,6 +58,10 @@ class ESXi
     parse(result.sub(/\A[^(]+/,''))
   end
 
+  def destroy! vmid
+    exec!('vim-cmd vmsvc/destroy ' + vmid)
+  end
+
   def vm_message vmid
     exec!('vim-cmd vmsvc/message' + vmid)
   end
@@ -94,6 +98,21 @@ class ESXi
     @m.synchronize {
       @ssh.exec!(command)
     }
+  end
+
+  def fork &block
+    conn = ESXi.new(@opts)
+    if block
+      begin
+        puts "connecting..."
+        conn.connect
+        block.call(conn)
+      ensure
+        conn.close
+      end
+    else
+      conn
+    end
   end
 
   def parse str
