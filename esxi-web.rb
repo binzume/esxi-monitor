@@ -90,7 +90,7 @@ class ESXiMonitorWeb < Sinatra::Base
           10.times do
             r = conn.exec!('vim-cmd vmsvc/message ' + params[:vmid])
             puts r
-            if r =~/^Virtual machine message\s*([^\s:]:+)/
+            if r =~/^Virtual machine message\s*([^\s:]+):/
               puts $1
               puts conn.exec!("vim-cmd vmsvc/message #{params[:vmid]} #{$1} 2")
               break
@@ -137,7 +137,11 @@ class ESXiMonitorWeb < Sinatra::Base
     # FIXME! vmdk name, etc...
     puts esxi.exec!('rm -r ' + dst_dir) if params['force']
     puts esxi.exec!('mkdir ' + dst_dir)
-    r = esxi.exec!("vmkfstools -i #{src_dir}/centos64.vmdk -d thin #{dst_dir}/centos64.vmdk")
+    img_name = if esxi.exec!("cat '#{src}' | grep '^scsi0:0.fileName'") =~/fileName = "([^"]+)"/
+      $1
+    end
+    puts "vmdk: #{img_name}"
+    r = esxi.exec!("vmkfstools -i #{src_dir}/#{img_name} -d thin #{dst_dir}/#{img_name}")
     puts r
     unless r =~/done./
       halt 500, {:status => 'error', :message => 'vmdk copy failed'}.to_json
