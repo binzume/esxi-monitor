@@ -26,7 +26,7 @@
 
 <h2>ESXi Monitor</h2>
 
-<div id="error" style="display:none;">ERROR: Please try disconnect and connect.</div>
+<div id="error">ERROR: Please try disconnect and connect.</div>
 
 
 </div>
@@ -47,11 +47,28 @@ VMs <button id="refresh_button">Reload</button>
 
 
 <div id="power_off_dialog" class="dialog">
- <h3>Power OFF</h3>
+ <h3>Power OFF <span class="vm_name"></span></h3>
  <button id="shutdown_button" class="">Shutdown</button> <br />
  <button id="power_off_button" class="careful">Power Off</button> <br />
  <button id="power_off_dialog_cancel_button">Cancel</button>
 </div>
+
+
+<div id="delete_vm_dialog" class="dialog">
+ <h3>Delete! VM <span class="vm_name"></span> ?</h3>
+ <button id="confirm_delete_vm_button" class="careful">DELETE</button>
+ <button id="delete_vm_dialog_cancel_button">Cancel</button>
+</div>
+
+
+<div id="copy_vm_dialog" class="dialog">
+ <h3>Copy VM <span class="vm_name"></span> ?</h3>
+ <input id="copy_vm_name" placeholder="VM Name" type="text" value="" />([a-z0-9_-]+)<br />
+ <input id="copy_vm_macaddr" placeholder="MAC ADDR" type="text" value="00:50:56:XX:YY:ZZ" /><br />
+ <button id="confirm_copy_vm_button" class="submit">Copy!</button>
+ <button id="copy_vm_dialog_cancel_button">Cancel</button>
+</div>
+
 
 
 
@@ -76,8 +93,10 @@ vmid: <span id="vm_id">--</span>
 
 
 <p>
+<button id="copy_vm_button" class="" style="display:none;">Copy VM</button>
+<button id="delete_vm_button" class="careful" style="display:none;">Delete VM</button>
 <button id="reboot_button" class="submit">Reboot</button>
-<button id="dlg_power_off_button" class="careful attach_right">Shutdown...</button><button id="power_on_button" class="">On</button>
+<button id="dlg_power_off_button" class="careful attach_right">Shutdown...</button><button id="power_on_button" class="">Power On</button>
 </p>
 
 

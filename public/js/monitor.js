@@ -2,6 +2,7 @@ var servers = [];
 var apiUrl = "/api/v1/";
 var token = null;
 var current_vmid = null;
+var click_count = 0;
 
 
 function check_connected(f) {
@@ -20,6 +21,14 @@ function disconnect() {
 		location.href="login.html";
 	});
 }
+
+function power_ctl_vm(vmid, state) {
+	var xhr = getxhr();
+	xhr.open('POST', apiUrl + "vms/" + vmid + "/power");
+	xhr.setRequestHeader("X-CSRFToken", token);
+	xhr.send(state);
+}
+
 
 function copy_vm(vmid, name, macaddr) {
 	var xhr = getxhr();
@@ -108,8 +117,11 @@ function load_vm_summary(vmid) {
 		if (result && result.status=='ok') {
 			ul.appendChild(element('li', "Status: " + result.summary.overallStatus));
 			ul.appendChild(element('li', "vmPath: " + result.summary.config.vmPathName));
+			ul.appendChild(element('li', "Memory: " + result.summary.config.memorySizeMB + "MB"));
+			ul.appendChild(element('li', "CPUs: " + result.summary.config.numCpu));
 
-			ul.appendChild(element('li', "bootTime: " + result.summary.runtime.bootTime));
+			ul.appendChild(element('li', "Power: " + result.summary.runtime.powerState));
+			ul.appendChild(element('li', "Boot time: " + result.summary.runtime.bootTime));
 
 			ul.appendChild(element('li', "guestFullName: " + result.summary.guest.guestFullName));
 			ul.appendChild(element('li', "Hostname: " + result.summary.guest.hostName));
@@ -125,46 +137,57 @@ function load_vm_summary(vmid) {
 window.addEventListener('load',(function(e){
 
 	document.getElementById('reboot_button').addEventListener('click',(function(e){
-		var vmid = document.getElementById('vm_id').innerText;
-        var xhr = getxhr();
-        xhr.open('POST', apiUrl + "vms/" + vmid + "/power");
-		xhr.setRequestHeader("X-CSRFToken", token);
-        xhr.send("reboot");
+		power_ctl_vm(current_vmid, "reboot");
 	}),false);
 
 	document.getElementById('power_on_button').addEventListener('click',(function(e){
-		var vmid = document.getElementById('vm_id').innerText;
-        var xhr = getxhr();
-        xhr.open('POST', apiUrl + "vms/" + vmid + "/power");
-		xhr.setRequestHeader("X-CSRFToken", token);
-        xhr.send("on");
+		power_ctl_vm(current_vmid, "on");
 	}),false);
 
-	document.getElementById('power_off_button').addEventListener('click',(function(e){
-		var vmid = document.getElementById('vm_id').innerText;
-        var xhr = getxhr();
-        xhr.open('POST', apiUrl + "vms/" + vmid + "/power");
-		xhr.setRequestHeader("X-CSRFToken", token);
-        xhr.send("off");
-	}),false);
-
-	document.getElementById('shutdown_button').addEventListener('click',(function(e){
-		var vmid = document.getElementById('vm_id').innerText;
-        var xhr = getxhr();
-        xhr.open('POST', apiUrl + "vms/" + vmid + "/power");
-		xhr.setRequestHeader("X-CSRFToken", token);
-        xhr.send("shutdown");
-	}),false);
-
+	// shutdown or power off
 	document.getElementById('dlg_power_off_button').addEventListener('click',(function(e){
-		new Dialog(document.getElementById('power_off_dialog'), document.getElementById('power_off_dialog_cancel_button')).show();
+		new Dialog(document.getElementById('power_off_dialog'), document.getElementById('power_off_dialog_cancel_button')
+		).onClick('power_off_button',function(){
+			power_ctl_vm(current_vmid, "off");
+		}).onClick('shutdown_button',function(){
+			power_ctl_vm(current_vmid, "shutdown");
+		}).show();
+
 	}),false);
-	
+
+	// delete
+	document.getElementById('delete_vm_button').addEventListener('click',(function(e){
+		document.getElementById('delete_vm_dialog').getElementsByClassName('vm_name')[0].innerText = current_vmid;
+		new Dialog(document.getElementById('delete_vm_dialog'), document.getElementById('delete_vm_dialog_cancel_button')).
+			onClick('confirm_delete_vm_button',function(){
+				delete_vm(current_vmid);
+		}).show();
+	}),false);
+
+	// copy
+	document.getElementById('copy_vm_button').addEventListener('click',(function(e){
+		document.getElementById('copy_vm_dialog').getElementsByClassName('vm_name')[0].innerText = current_vmid;
+		new Dialog(document.getElementById('copy_vm_dialog'), document.getElementById('copy_vm_dialog_cancel_button')).
+			onClick('confirm_copy_vm_button',function(){
+				copy_vm(current_vmid, document.getElementById('copy_vm_name').value, document.getElementById('copy_vm_macaddr').value);
+		}).show();
+	}),false);
+
+
 	document.getElementById('refresh_button').addEventListener('click',(function(e){
 		load_vms();
 		if (current_vmid) {
 			load_vm_data(current_vmid);
 			load_vm_summary(current_vmid);
+		}
+	}),false);
+	
+	document.getElementById('vm_name').addEventListener('click',(function(e){
+		click_count ++;
+		if (click_count >= 5) {
+			// show hidden functions...
+			document.getElementById('copy_vm_button').style.display = "block";
+			document.getElementById('delete_vm_button').style.display = "block";
 		}
 	}),false);
 	

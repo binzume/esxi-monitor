@@ -10,6 +10,7 @@
 
 #error {
 	color:red;
+	display: none;
 }
 
 
@@ -19,7 +20,12 @@
 	border-radius: 3px;
 	border: 2px solid #bbbbbb;
 	background-color: #ffffff;
-	width: 300pt;
-margin: 0 auto;
+	width: 250pt;
+	margin: 0 auto;
+	padding: 6pt 20pt;
+}
+
+.footer {
+	text-align: right;
 }
 
