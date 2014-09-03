@@ -31,6 +31,11 @@ class ESXi
     }
   end
 
+  def hostsummary
+    result = exec!('vim-cmd hostsvc/hostsummary')
+    parse(result.sub(/\A[^(]+/,''))
+  end
+
   def summary vmid
     result = exec!('vim-cmd vmsvc/get.summary ' + vmid)
     parse(result.sub(/\A[^(]+/,''))
@@ -157,7 +162,7 @@ class ESXi
       true
     elsif str.sub!(/\Afalse/, '')
       false
-    elsif str.sub!(/\A(\d+)/, '')
+    elsif str.sub!(/\A(-?\d+)/, '')
       $1.to_i
     elsif str.sub!(/\A<unset>/, '')
       nil

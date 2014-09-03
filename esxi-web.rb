@@ -163,6 +163,15 @@ class ESXiMonitorWeb < Sinatra::Base
     {:status => 'ok?', :vmid => created_vmid.strip}.to_json
   end
 
+  get '/api/v1/esxi/' do
+    content_type :json
+    halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
+
+    result = ESXI.instance.hostsummary
+
+    {:status=> 'ok', :hostsummary => result}.to_json
+  end
+
   get '/api/v1/esxi/disconnect' do
     halt 200, {:status => 'ok', :message => 'already disconnected'}.to_json unless ESXI.instance
 
