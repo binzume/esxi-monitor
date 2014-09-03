@@ -62,6 +62,7 @@ function load_vms() {
 						document.getElementById('vm_id').innerText = vm.id;
 						document.getElementById('vm_name').innerText = vm.name;
 						load_vm_data(vm.id);
+            			load_vm_summary(vm.id);
 					}),false);
 				})(vm);
 				e.appendChild(li);
@@ -94,6 +95,29 @@ function load_vm_data(vmid) {
 			
 		} else {
 			document.getElementById('error').style.display = "block";
+		}
+	});
+}
+
+function load_vm_summary(vmid) {
+	current_vmid = vmid;
+	var ul = document.getElementById('vm_summary');
+	ul.innerHTML = "";
+	getJson(apiUrl + "vms/" + vmid,function(result) {
+		ul.innerHTML = "";
+		if (result && result.status=='ok') {
+			ul.appendChild(element('li', "Status: " + result.summary.overallStatus));
+			ul.appendChild(element('li', "vmPath: " + result.summary.config.vmPathName));
+
+			ul.appendChild(element('li', "bootTime: " + result.summary.runtime.bootTime));
+
+			ul.appendChild(element('li', "guestFullName: " + result.summary.guest.guestFullName));
+			ul.appendChild(element('li', "Hostname: " + result.summary.guest.hostName));
+			ul.appendChild(element('li', "IP Address: " + result.summary.guest.ipAddress));
+			ul.appendChild(element('li', "VMware Tools: " + result.summary.guest.toolsRunningStatus));
+
+		} else {
+			ul.appendChild(element('li', "cannot get VM summary."));
 		}
 	});
 }
@@ -140,6 +164,7 @@ window.addEventListener('load',(function(e){
 		load_vms();
 		if (current_vmid) {
 			load_vm_data(current_vmid);
+			load_vm_summary(current_vmid);
 		}
 	}),false);
 	
