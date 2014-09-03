@@ -37,18 +37,6 @@ class ESXiMonitorWeb < Sinatra::Base
     {:status => 'ok'}.to_json
   end
 
-  get '/api/v1/vms/:vmid/guest' do
-    content_type :json
-    halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
-
-    result = ESXI.instance.guest(params[:vmid])
-    if result && result[:_type] == "vim.fault.NotFound"
-      halt 404, {:status => 'error', :message => result["msg"]}.to_json
-    end
-
-    {:status=> 'ok', :guest => result}.to_json
-  end
-
   get '/api/v1/vms/:vmid' do
     content_type :json
     halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
@@ -71,6 +59,43 @@ class ESXiMonitorWeb < Sinatra::Base
     {:status=> 'ok'}.to_json
   end
 
+  get '/api/v1/vms/:vmid/guest' do
+    content_type :json
+    halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
+
+    result = ESXI.instance.guest(params[:vmid])
+    if result && result[:_type] == "vim.fault.NotFound"
+      halt 404, {:status => 'error', :message => result["msg"]}.to_json
+    end
+
+    {:status=> 'ok', :guest => result}.to_json
+  end
+
+  get '/api/v1/vms/:vmid/config' do
+    content_type :json
+    halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
+
+    result = ESXI.instance.config(params[:vmid])
+    if result && result[:_type] == "vim.fault.NotFound"
+      halt 404, {:status => 'error', :message => result["msg"]}.to_json
+    end
+
+    {:status=> 'ok', :config => result}.to_json
+  end
+
+  get '/api/v1/vms/:vmid/runtime' do
+    content_type :json
+    halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
+
+    result = ESXI.instance.runtime(params[:vmid])
+    if result && result[:_type] == "vim.fault.NotFound"
+      halt 404, {:status => 'error', :message => result["msg"]}.to_json
+    end
+
+    {:status=> 'ok', :runtime => result}.to_json
+  end
+
+
   get '/api/v1/vms' do
     content_type :json
     halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
@@ -84,23 +109,7 @@ class ESXiMonitorWeb < Sinatra::Base
 
     v = request.body.read
     if v == 'on'
-      t = Thread.new do
-        sleep(3)
-        ESXI.instance.fork {|conn|
-          10.times do
-            r = conn.exec!('vim-cmd vmsvc/message ' + params[:vmid])
-            puts r
-            if r =~/^Virtual machine message\s*([^\s:]+):/
-              puts $1
-              puts conn.exec!("vim-cmd vmsvc/message #{params[:vmid]} #{$1} 2")
-              break
-            end
-            sleep(2)
-          end
-        }
-      end
-      puts ESXI.instance.power_on(params[:vmid])
-      t.terminate
+      ESXI.instance.power_on_with_answer(params[:vmid], 2)
     elsif v == 'off'
       ESXI.instance.power_off(params[:vmid])
     elsif v == 'shutdown'
