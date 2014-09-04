@@ -14,10 +14,26 @@ ESXi上のVMの一覧表示や，再起動などをブラウザ上からでき�
 VMの削除や複製もサポートする予定です(そのうち)．
 
 
+Installation
+--------------
+
+- 事前にESXiへSSHでログインできることを確認
+- conf/app.jsonを編集，または環境変数ESXI_HOSTで，ESXiのホストを指定してください
+- bundle install
+- ruby esxi-web.rb
+- sinatraのデフォルトポート(4567)で待ち受けているのでブラウザで開く
+
+64bit Windowsで実行時している場合，ログイン時に Creation of file mapping failed with error: 998 が発生することがありますが，
+pagent等を終了すると大丈夫かもしれません．
+
+
 API
 ----
 
-情報はjsonで取得できます．細かい仕様は public/js下のlogin.jsやmonitor.jsを読むのが手っ取り早いです．
+情報はjsonで取得できます．APIの仕様はコロコロ変わります．
+
+現在の仕様は public/js下のlogin.jsやmonitor.jsを読むのが手っ取り早いです．
+
 
 ### GET /api/v1/esxi/status
 
@@ -34,6 +50,10 @@ API
 
 切断します．
 
+### GET /api/v1/esxi/
+
+ESXiの情報を取得します．hostsummary相当．
+
 
 ### GET /api/v1/vms
 
@@ -46,7 +66,14 @@ VM情報．get.summary相当
 
 ### DELETE /api/v1/vms/:vmid
 
-VMを削除
+VMを削除．
+
+イベントリから削除し，ファイルも削除します．削除すると元には戻せません．
+
+
+### GETT /api/v1/vms/:vmid/power
+
+get.runtimeのpowerState相当．
 
 ### POST /api/v1/vms/:vmid/power
 
@@ -56,7 +83,9 @@ on, off, shutdown, reboot のいずれかをリクエストのボディとして
 
 ### POST /api/v1/vms/:vmid/copy
 
-実装中です．VMの複製をします．
+VMの複製をします．
+
+この昨日は実装中で特定の構成の環境しかサポートしません．コピー先の名前とMACアドレスを指定してください．
 
 
 ### GET /api/v1/vms/:vmid/guest

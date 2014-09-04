@@ -95,12 +95,23 @@ class ESXiMonitorWeb < Sinatra::Base
     {:status=> 'ok', :runtime => result}.to_json
   end
 
-
   get '/api/v1/vms' do
     content_type :json
     halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
 
     {:status=> 'ok', :vms => ESXI.instance.allvms()}.to_json
+  end
+
+  get '/api/v1/vms/:vmid/power' do
+    content_type :json
+    halt 400, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
+
+    result = ESXI.instance.runtime(params[:vmid])
+    if result && result[:_type] == "vim.fault.NotFound"
+      halt 404, {:status => 'error', :message => result["msg"]}.to_json
+    end
+
+    {:status=> 'ok', :power => result["powerState"]}.to_json
   end
 
   post '/api/v1/vms/:vmid/power' do
