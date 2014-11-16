@@ -1,0 +1,88 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel=stylesheet type="text/css" href="css/form.css" />
+	<link rel=stylesheet type="text/css" href="css/list.css" />
+	<link rel=stylesheet type="text/css" href="css/layout_sidemenu.css" />
+	<link rel=stylesheet type="text/css" href="css/monitor.css" />
+	<title>ESXi Monitor</title>
+	<script src="js/lib.js"></script>
+	<script src="js/createvm.js"></script>
+</head>
+<body>
+
+<div id="content">
+
+<header>
+<ul class="menubar">
+<li><span id="login_user">...</span></li>
+<li><a href="login.html">Connect</a></li>
+<li><a href="javascript:disconnect()">Disconnect</a></li>
+</ul>
+</header>
+
+
+<div>
+
+<h2>ESXi Monitor - CREATE VM(Experimental)</h2>
+
+<div id="error">ERROR: Please try disconnect and connect.</div>
+
+
+</div>
+
+<div class="main">
+
+
+<fieldset class="group">
+<legend id="host_name">New VM</legend>
+
+<form action="/api/v1/vms/" method="POST">
+<input id="api_token" name="csrf_token" type="hidden" value=""/>
+
+<h3>Basic</h3>
+
+<ul class="simple">
+ <li>Name: <input name="name" type="text" size="10" value=""/>(vm name)</li>
+ <li>CPU: <input name="numvcpus" type="text" size="10" value="1"/> Cores</li>
+ <li>Mem: <input name="memsize" type="text" size="10" value="1024"/>MB</li>
+ <li>Disk: <input name="disk_size" type="text" size="10" value="20G"/>B</li>
+</ul>
+
+<h3>Network</h3>
+
+<ul class="simple">
+</ul>
+
+not supported yet.
+<button id="add_if_button" disabled>Add NIC</button>
+
+
+<h3>VNC</h3>
+
+<ul class="simple">
+ <li>enable?: <input name="vnc_enable" type="checkbox" size="10" /></li>
+ <li>Port: <input name="vnc_port" type="text" size="10" value="5901"/></li>
+ <li>Pass: <input name="vnc_pass" type="text" size="10" value=""/>(8 chars max)</li>
+</ul>
+
+<button id="create_vm_button">Cancel</button>
+<button id="create_vm_button" class="submit">Create!</button>
+
+</form>
+
+</fieldset>
+
+</div>
+
+
+<div class="footer">
+<a href="https://github.com/binzume/esxi-monitor">ESXi Monitor</a> v0.1
+</div>
+
+</div>
+
+</body>
+</html>
+
+
