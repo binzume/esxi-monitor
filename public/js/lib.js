@@ -71,6 +71,13 @@ function Dialog(elem, cancel) {
 	if (cancel) {
 		cancel.addEventListener('click', this._oncancel, false);
 		this.onDismissFuncs.push(function(){cancel.removeEventListener('click', self._oncancel, false)});
+	} else {
+		var cancels = elem.getElementsByClassName('dialog_cancel');
+		for (var i=0; i<cancels.length; i++) {
+			var cancel = cancels[i];
+			cancel.addEventListener('click', this._oncancel, false);
+			this.onDismissFuncs.push(function(){cancel.removeEventListener('click', self._oncancel, false)});
+		}
 	}
 }
 
@@ -96,7 +103,8 @@ Dialog.prototype.dismiss = function() {
 Dialog.prototype.onClick = function(id, f) {
 	var self = this;
 	var e = document.getElementById(id);
-	var onclick =  function(){
+	var onclick =  function(e){
+		e.preventDefault();
 		self.dismiss();
 		f(this, self);
 	};

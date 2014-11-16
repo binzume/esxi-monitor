@@ -16,6 +16,7 @@
 <header>
 <ul class="menubar">
 <li><span id="login_user">...</span></li>
+<li><a href="host.html">Host summary</a></li>
 <li><a href="login.html">Connect</a></li>
 <li><a href="javascript:disconnect()">Disconnect</a></li>
 </ul>
@@ -26,7 +27,7 @@
 
 <h2>ESXi Monitor</h2>
 
-<div id="error">ERROR: Please try disconnect and connect.</div>
+<div id="error">ERROR: Please try 'Disconnect' and 'Connect'.</div>
 
 
 </div>
@@ -36,8 +37,6 @@ VMs <button id="refresh_button">Reload</button>
 
 <ul class="simple" id="vm_list">
  <li>please reload</li>
- <li>vm01</li>
- <li>vm02</li>
 </ul>
 
 </div>
@@ -49,7 +48,7 @@ VMs <button id="refresh_button">Reload</button>
 <div id="power_off_dialog" class="dialog">
  <h3>Power OFF <span class="vm_name"></span></h3>
  <button id="shutdown_button" class="">Shutdown</button> <br />
- <button id="power_off_button" class="careful">Power Off</button> <br />
+ <button id="power_off_button" class="careful">Force Power Off</button> <br />
  <button id="power_off_dialog_cancel_button">Cancel</button>
 </div>
 
@@ -80,7 +79,6 @@ vmid: <span id="vm_id">--</span>
 <h3>Summary:</h3>
 <ul class="simple" id="vm_summary">
  <li>vm_summary</li>
- <li>not implemented...</li>
 </ul>
 
 

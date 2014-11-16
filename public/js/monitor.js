@@ -68,10 +68,8 @@ function load_vms() {
 				li.style.cursor = 'pointer';
 				(function(vm){
 					li.addEventListener('click',(function(e){
-						document.getElementById('vm_id').innerText = vm.id;
 						document.getElementById('vm_name').innerText = vm.name;
-						load_vm_data(vm.id);
-            			load_vm_summary(vm.id);
+            			location.href="#" + vm.id;
 					}),false);
 				})(vm);
 				e.appendChild(li);
@@ -84,6 +82,7 @@ function load_vms() {
 
 function load_vm_data(vmid) {
 	current_vmid = vmid;
+	document.getElementById('vm_id').innerText = vmid;
 	var ul = document.getElementById('vm_guest');
 	ul.innerHTML = "";
 	getJson(apiUrl + "vms/" + vmid + "/guest",function(result) {
@@ -108,6 +107,19 @@ function load_vm_data(vmid) {
 	});
 }
 
+function progbar(parcent) {
+	var prog = element('div');
+	var bar = element('div', prog);
+	prog.style.width = ""+ parcent + "%" 
+	prog.style.height = "8pt" 
+	prog.style.backgroundColor="#ff0000";
+	bar.style.width = "100pt" 
+	bar.style.height = "8pt" 
+	bar.style.backgroundColor="#00aa00";
+	bar.style.display = "inline-block"
+	return bar;
+}
+
 function load_vm_summary(vmid) {
 	current_vmid = vmid;
 	var ul = document.getElementById('vm_summary');
@@ -117,16 +129,21 @@ function load_vm_summary(vmid) {
 		if (result && result.status=='ok') {
 			ul.appendChild(element('li', "Status: " + result.summary.overallStatus));
 			ul.appendChild(element('li', "vmPath: " + result.summary.config.vmPathName));
-			ul.appendChild(element('li', "Memory: " + result.summary.config.memorySizeMB + "MB"));
-			ul.appendChild(element('li', "CPUs: " + result.summary.config.numCpu));
+			ul.appendChild(element('li', ["Memory: " + result.summary.config.memorySizeMB + "MB ",  progbar( result.summary.quickStats.guestMemoryUsage / result.summary.runtime.maxMemoryUsage * 100 )]));
+			ul.appendChild(element('li', ["CPUs: " + result.summary.config.numCpu, progbar( result.summary.quickStats.overallCpuUsage / result.summary.runtime.maxCpuUsage * 100 )]));
 
 			ul.appendChild(element('li', "Power: " + result.summary.runtime.powerState));
 			ul.appendChild(element('li', "Boot time: " + result.summary.runtime.bootTime));
+			ul.appendChild(element('li', "uptime: " + result.summary.quickStats.uptimeSeconds + "sec."));
 
 			ul.appendChild(element('li', "guestFullName: " + result.summary.guest.guestFullName));
 			ul.appendChild(element('li', "Hostname: " + result.summary.guest.hostName));
 			ul.appendChild(element('li', "IP Address: " + result.summary.guest.ipAddress));
 			ul.appendChild(element('li', "VMware Tools: " + result.summary.guest.toolsRunningStatus));
+			
+			document.getElementById('power_on_button').disabled = (result.summary.runtime.powerState == "poweredOn");
+			document.getElementById('dlg_power_off_button').disabled = (result.summary.runtime.powerState == "poweredOff");
+			document.getElementById('reboot_button').disabled = (result.summary.runtime.powerState == "poweredOff");
 
 		} else {
 			ul.appendChild(element('li', "cannot get VM summary."));
@@ -193,6 +210,14 @@ window.addEventListener('load',(function(e){
 	
 	load_vms();
 
+	if (location.hash) {
+		var vmid = location.hash.slice(1);
+		if (vmid) {
+			load_vm_data(vmid);
+			load_vm_summary(vmid);
+		}
+	}
+
 	check_connected(function(result){
 		token = result.token;
 		if (result.connected) {
@@ -204,3 +229,13 @@ window.addEventListener('load',(function(e){
 
 }),false);
 
+
+window.addEventListener('hashchange',(function(e){
+	if (location.hash) {
+		var vmid = location.hash.slice(1);
+		if (vmid) {
+			load_vm_data(vmid);
+			load_vm_summary(vmid);
+		}
+	}
+}),false);

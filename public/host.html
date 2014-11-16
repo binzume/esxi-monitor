@@ -1,0 +1,61 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel=stylesheet type="text/css" href="css/form.css" />
+	<link rel=stylesheet type="text/css" href="css/list.css" />
+	<link rel=stylesheet type="text/css" href="css/layout_sidemenu.css" />
+	<link rel=stylesheet type="text/css" href="css/monitor.css" />
+	<title>ESXi Monitor</title>
+	<script src="js/lib.js"></script>
+	<script src="js/hostinfo.js"></script>
+</head>
+<body>
+
+<div id="content">
+
+<header>
+<ul class="menubar">
+<li><span id="login_user">...</span></li>
+<li><a href="login.html">Connect</a></li>
+<li><a href="javascript:disconnect()">Disconnect</a></li>
+</ul>
+</header>
+
+
+<div>
+
+<h2>ESXi Monitor[HOST]</h2>
+
+<div id="error">ERROR: Please try disconnect and connect.</div>
+
+
+</div>
+
+<div class="main">
+
+
+<fieldset class="group">
+<legend id="host_name">name</legend>
+
+
+<h3>Summary:</h3>
+<ul class="simple" id="host_summary">
+ <li>vm_summary</li>
+</ul>
+
+
+</fieldset>
+
+</div>
+
+
+<div class="footer">
+<a href="https://github.com/binzume/esxi-monitor">ESXi Monitor</a> v0.1
+</div>
+
+</div>
+
+</body>
+</html>
+
+
