@@ -145,11 +145,14 @@ class ESXiMonitorWeb < Sinatra::Base
     dirname = name
     datastore = 'datastore1' # fixme!
     vmpath = '/vmfs/volumes/datastore1/' + dirname
+    guestos = params['guestos'] || "otherlinux-64"
 
     esxi = ESXI.instance
     r = esxi.exec!("vim-cmd vmsvc/createdummyvm #{name} [#{datastore}] /#{dirname}/#{name}.vmx")
     halt 503, {:status => 'error', :message => 'cant create vm'}.to_json unless r =~ /^\d+/
     vmid = r
+
+    r = esxi.exec!("echo guestOS = \\\"#{guestos}\\\" >> #{vmpath}/#{name}.vmx")
 
     if params['memsize'] && params['memsize'] =~ /^\d+$/
       r = esxi.exec!("echo memsize = \"#{params['memsize']}\" >> #{vmpath}/#{name}.vmx")
@@ -159,32 +162,32 @@ class ESXiMonitorWeb < Sinatra::Base
       r = esxi.exec!("echo numvcpus = \"#{params['numvcpus']}\" >> #{vmpath}/#{name}.vmx")
     end
 
-    if params['disk_size'] && params['disk_size'] =~ /^\d+\w*$/
-      r = esxi.exec!("rm -f #{vmpath}/*.vmdk")
-      r = esxi.exec!("vmkfstools --createvirtualdisk #{params['disk_size']} -d thin #{vmpath}/#{name}.vmdk")
-    end
-
     if true
       r = esxi.exec!("echo ethernet0.present = \"TRUE\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo ethernet0.virtualDev = \"e1000\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo ethernet0.features = \"15\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo ethernet0.networkName = \"VM Network\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo ethernet0.virtualDev = \\\"e1000\\\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo ethernet0.features = \\\"15\\\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo ethernet0.networkName = \\\"VM Network\\\" >> #{vmpath}/#{name}.vmx")
       ## ethernet0.addressType = "static"
       ## ethernet0.address = "00:50:56:xx:xx:xx"
     end
 
     if params['vnc_enable'] && params['vnc_enable'] == 'on'
-      r = esxi.exec!("echo RemoteDisplay.vnc.enabled = \"TRUE\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo RemoteDisplay.vnc.port = \"#{params['vnc_port']}\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo RemoteDisplay.vnc.password = \"params['vnc_passwd']\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo RemoteDisplay.vnc.keyMap = \"jp\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo RemoteDisplay.vnc.enabled = \\\"TRUE\\\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo RemoteDisplay.vnc.port = \\\"#{params['vnc_port']}\\\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo RemoteDisplay.vnc.password = \\\"#{params['vnc_passwd']}\\\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo RemoteDisplay.vnc.keyMap = \\\"jp\\\" >> #{vmpath}/#{name}.vmx")
+    end
+
+    if params['disk_size'] && params['disk_size'] =~ /^\d+\w*$/
+      r = esxi.exec!("rm -f #{vmpath}/*.vmdk")
+      r = esxi.exec!("vmkfstools --createvirtualdisk #{params['disk_size']} -d thin #{vmpath}/#{name}.vmdk")
     end
 
     # reload vmx
     r = esxi.exec!("vim-cmd vmsvc/reload #{vmid}")
 
     content_type :json
-    {:status => '?'}.to_json
+    {:status => 'probably ok'}.to_json
   end
 
   # copy vm

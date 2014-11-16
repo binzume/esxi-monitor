@@ -145,6 +145,10 @@ function load_vm_summary(vmid) {
 			document.getElementById('dlg_power_off_button').disabled = (result.summary.runtime.powerState == "poweredOff");
 			document.getElementById('reboot_button').disabled = (result.summary.runtime.powerState == "poweredOff");
 
+			document.getElementById('copy_vm_button').disabled = (result.summary.runtime.powerState == "poweredOn");
+			document.getElementById('delete_vm_button').disabled = (result.summary.runtime.powerState == "poweredOn");
+
+
 		} else {
 			ul.appendChild(element('li', "cannot get VM summary."));
 		}
