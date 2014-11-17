@@ -32,6 +32,21 @@
 
 <div class="main">
 
+<div id="add_nic_dialog" class="dialog">
+ <h3>NIC</h3>
+ Nic Type:
+ <form id="add_nic_form">
+   <select id="nic_device">
+    <option value="vmxnet3">vmxnet3</option>
+    <option value="e1000">E1000</option>
+   </select><br />
+   <label><input id="nic_static_addr" type="checkbox" />static mac addr.</label><br />
+   <input id="nic_macaddr" placeholder="MAC ADDR" type="text" value="00:50:56:XX:YY:ZZ" /><br />
+ </form>
+ <button id="add_nic_button2" class="submit">Add!</button>
+ <button class="dialog_cancel">Cancel</button>
+</div>
+
 
 <fieldset class="group">
 <legend id="host_name">New VM</legend>
@@ -46,21 +61,23 @@
  <li>CPU: <input name="numvcpus" type="text" size="10" value="1"/> Cores</li>
  <li>Mem: <input name="memsize" type="text" size="10" value="1024"/>MB</li>
  <li>Disk: <input name="disk_size" type="text" size="10" value="20G"/>B</li>
+ <li>OS: <input name="guestos" type="text" size="10" value="otherlinux-64"/> fill valid vmware guestOS type.</li>
 </ul>
 
 <h3>Network</h3>
 
-<ul class="simple">
+<ul class="simple" id="nic_list">
+ <li>eth0 e1000</li>
 </ul>
 
 not supported yet.
-<button id="add_if_button" disabled>Add NIC</button>
+<button id="add_nic_button" disabled_>Add NIC</button>
 
 
 <h3>VNC</h3>
 
 <ul class="simple">
- <li>enable?: <input name="vnc_enable" type="checkbox" size="10" /></li>
+ <li><label><input name="vnc_enable" type="checkbox" size="10" />Enable VNC</label></li>
  <li>Port: <input name="vnc_port" type="text" size="10" value="5901"/></li>
  <li>Pass: <input name="vnc_passwd" type="text" size="10" value=""/>(8 chars max)</li>
 </ul>
