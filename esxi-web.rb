@@ -180,8 +180,13 @@ class ESXiMonitorWeb < Sinatra::Base
     end
 
     if params['disk_size'] && params['disk_size'] =~ /^\d+\w*$/
+      img_name = if esxi.exec!("cat '#{vmxpath}' | grep '^scsi0:0.fileName'") =~/fileName = "([^"]+)"/
+        $1
+      else
+        "#{name}.vmdk"
+      end
       r = esxi.exec!("rm -f #{vmpath}/*.vmdk")
-      r = esxi.exec!("vmkfstools --createvirtualdisk #{params['disk_size']} -d thin #{vmpath}/#{name}.vmdk")
+      r = esxi.exec!("vmkfstools --createvirtualdisk #{params['disk_size']} -d thin #{vmpath}/#{img_name}")
     end
 
     # reload vmx
