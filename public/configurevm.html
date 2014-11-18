@@ -7,7 +7,7 @@
 	<link rel=stylesheet type="text/css" href="css/monitor.css" />
 	<title>ESXi Monitor</title>
 	<script src="js/lib.js"></script>
-	<script src="js/createvm.js"></script>
+	<script src="js/configurevm.js"></script>
 </head>
 <body>
 
@@ -24,7 +24,9 @@
 
 <div>
 
-<h2>CREATE VM(Experimental)</h2>
+<h2>CONFIGURE VM(Experimental)</h2>
+
+Please shutdown vm before configure...
 
 <div id="error">ERROR: Please try '<a href="javascript:disconnect()">Disconnect</a>' and 'Connect'.</div>
 
@@ -49,21 +51,22 @@
 </div>
 
 
+<div id="select_iso_dialog" class="dialog">
+ <h3>NIC</h3>
+ Nic Type:
+ <form id="select_iso_form">
+   <select id="iso_list">
+    <option value="">None</option>
+   </select><br />
+ </form>
+ <button id="select_iso_ok" class="submit">Ok</button>
+ <button class="dialog_cancel">Cancel</button>
+</div>
+
 <fieldset class="group">
-<legend id="host_name">New VM</legend>
+<legend id="host_name">VM Config</legend>
 
-<form action="/api/v1/vms/" method="POST">
-<input id="api_token" name="csrf_token" type="hidden" value=""/>
 
-<h3>Basic</h3>
-
-<ul class="simple">
- <li>Name: <input name="name" type="text" size="10" value=""/>(vm name)</li>
- <li>CPU: <input name="numvcpus" type="text" size="10" value="1"/> Cores</li>
- <li>Mem: <input name="memsize" type="text" size="10" value="1024"/>MB</li>
- <li>Disk: <input name="disk_size" type="text" size="10" value="20G"/>B</li>
- <li>OS: <input name="guestos" type="text" size="10" value="otherlinux-64"/> fill valid vmware guestOS type.</li>
-</ul>
 
 <h3>Network</h3>
 
@@ -75,18 +78,31 @@ not supported yet.
 <button id="add_nic_button" disabled_>Add NIC</button>
 
 
+<h3>CD-ROM</h3>
+
+<form id="configure_cdrom_form" class="configure_vm_form" action="/api/v1/vms/:vmid/config/cdrom" method="POST">
+<input name="csrf_token" type="hidden" value=""/>
+
+<ul class="simple">
+ <li><label><input name="connect" type="checkbox" size="10" />Enable</label></li>
+ <li>Image: <input name="image" type="text" size="20" value=""/><button id="select_image_button" >...</button>(.iso path)</li>
+</ul>
+<button id="vnc_config_button" class="submit">Apply!</button>
+</form>
+
 <h3>VNC</h3>
+
+<form class="configure_vm_form" action="/api/v1/vms/:vmid/config/vnc" method="POST">
+<input name="csrf_token" type="hidden" value=""/>
 
 <ul class="simple">
  <li><label><input name="vnc_enable" type="checkbox" size="10" />Enable VNC</label></li>
  <li>Port: <input name="vnc_port" type="text" size="10" value="5901"/></li>
  <li>Pass: <input name="vnc_passwd" type="text" size="10" value=""/>(8 chars max)</li>
 </ul>
-
-<button id="create_vm_button">Cancel</button>
-<button id="create_vm_button" class="submit">Create!</button>
-
+<button id="vnc_config_button" class="submit">Apply!</button>
 </form>
+
 
 </fieldset>
 

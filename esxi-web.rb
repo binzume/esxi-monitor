@@ -152,30 +152,31 @@ class ESXiMonitorWeb < Sinatra::Base
     halt 503, {:status => 'error', :message => 'cant create vm'}.to_json unless r =~ /^\d+/
     vmid = r
 
-    r = esxi.exec!("echo guestOS = \\\"#{guestos}\\\" >> #{vmpath}/#{name}.vmx")
+    vmxpath = "#{vmpath}/#{name}.vmx"
+    r = esxi.exec!("echo guestOS = \\\"#{guestos}\\\" >> #{vmxpath}")
 
     if params['memsize'] && params['memsize'] =~ /^\d+$/
-      r = esxi.exec!("echo memsize = \"#{params['memsize']}\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo memsize = \"#{params['memsize']}\" >> #{vmxpath}")
     end
 
     if params['numvcpus'] && params['numvcpus'] =~ /^\d+$/
-      r = esxi.exec!("echo numvcpus = \"#{params['numvcpus']}\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo numvcpus = \"#{params['numvcpus']}\" >> #{vmxpath}")
     end
 
     if true
-      r = esxi.exec!("echo ethernet0.present = \"TRUE\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo ethernet0.virtualDev = \\\"e1000\\\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo ethernet0.features = \\\"15\\\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo ethernet0.networkName = \\\"VM Network\\\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo ethernet0.present = \"TRUE\" >> #{vmxpath}")
+      r = esxi.exec!("echo ethernet0.virtualDev = \\\"e1000\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo ethernet0.features = \\\"15\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo ethernet0.networkName = \\\"VM Network\\\" >> #{vmxpath}")
       ## ethernet0.addressType = "static"
       ## ethernet0.address = "00:50:56:xx:xx:xx"
     end
 
     if params['vnc_enable'] && params['vnc_enable'] == 'on'
-      r = esxi.exec!("echo RemoteDisplay.vnc.enabled = \\\"TRUE\\\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo RemoteDisplay.vnc.port = \\\"#{params['vnc_port']}\\\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo RemoteDisplay.vnc.password = \\\"#{params['vnc_passwd']}\\\" >> #{vmpath}/#{name}.vmx")
-      r = esxi.exec!("echo RemoteDisplay.vnc.keyMap = \\\"jp\\\" >> #{vmpath}/#{name}.vmx")
+      r = esxi.exec!("echo RemoteDisplay.vnc.enabled = \\\"TRUE\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo RemoteDisplay.vnc.port = \\\"#{params['vnc_port']}\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo RemoteDisplay.vnc.password = \\\"#{params['vnc_passwd']}\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo RemoteDisplay.vnc.keyMap = \\\"jp\\\" >> #{vmxpath}")
     end
 
     if params['disk_size'] && params['disk_size'] =~ /^\d+\w*$/
@@ -188,6 +189,79 @@ class ESXiMonitorWeb < Sinatra::Base
 
     content_type :json
     {:status => 'probably ok'}.to_json
+  end
+
+  get '/api/v1/esxi/datastore/isoimages' do
+
+    datastore = 'datastore1' # fixme!
+    dir = '/vmfs/volumes/' + datastore + '/images'
+
+    esxi = ESXI.instance
+    r = esxi.exec!("ls #{dir}/*.iso")
+
+    content_type :json
+    {:status => 'ok', :images => r.split(/\s+/)}.to_json
+  end
+
+  post '/api/v1/vms/:vmid/config/cdrom' do
+
+    vmid = params[:vmid]
+    esxi = ESXI.instance
+    summary = esxi.summary(vmid)
+    if summary["config"]["vmPathName"] =~/\[([^\]]+)\]\s*(.+)/
+      vmxpath = "/vmfs/volumes/" + $1 + "/" + $2
+      vmdir = File.dirname(vmxpath)
+    else
+      halt 503
+    end
+
+    dev = 'ide1:0'
+    image = params['image']
+    connect = params['connect'] == 'on'
+
+    r = esxi.exec!("sed -i '/^#{dev}\\\./d' #{vmxpath}")
+    if image
+      r = esxi.exec!("echo #{dev}.present = \\\"TRUE\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo #{dev}.clientDevice = \\\"FALSE\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo #{dev}.startConnected = \\\"#{connect}\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo #{dev}.deviceType = \\\"cdrom-image\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo #{dev}.fileName = \\\"#{image}\\\" >> #{vmxpath}")
+    end
+
+    # reload vmx
+    r = esxi.exec!("vim-cmd vmsvc/reload #{vmid}")
+
+    content_type :json
+    {:status => 'probably ok', :message => 'Please reboot a VM.'}.to_json
+  end
+
+  post '/api/v1/vms/:vmid/config/vnc' do
+
+    vmid = params[:vmid]
+    esxi = ESXI.instance
+    summary = esxi.summary(vmid)
+    if summary["config"]["vmPathName"] =~/\[([^\]]+)\]\s*(.+)/
+      vmxpath = "/vmfs/volumes/" + $1 + "/" + $2
+      vmdir = File.dirname(vmxpath)
+    else
+      halt 503
+    end
+
+    dev = 'RemoteDisplay.vnc'
+
+    r = esxi.exec!("sed -i '/^#{dev}\\\./d' #{vmxpath}")
+    if params['vnc_enable'] && params['vnc_enable'] == 'on'
+      r = esxi.exec!("echo #{dev}.enabled = \\\"TRUE\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo #{dev}.port = \\\"#{params['vnc_port']}\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo #{dev}.password = \\\"#{params['vnc_passwd']}\\\" >> #{vmxpath}")
+      r = esxi.exec!("echo #{dev}.keyMap = \\\"jp\\\" >> #{vmxpath}")
+    end
+
+    # reload vmx
+    r = esxi.exec!("vim-cmd vmsvc/reload #{vmid}")
+
+    content_type :json
+    {:status => 'probably ok', :message => 'Please reboot a VM.'}.to_json
   end
 
   # copy vm

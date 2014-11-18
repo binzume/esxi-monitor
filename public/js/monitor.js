@@ -22,6 +22,14 @@ function disconnect() {
 	});
 }
 
+
+function select_vm(vmid) {
+	current_vmid = vmid;
+	load_vm_data(vmid);
+	load_vm_summary(vmid);
+}
+
+
 function power_ctl_vm(vmid, state) {
 	var xhr = getxhr();
 	xhr.open('POST', apiUrl + "vms/" + vmid + "/power");
@@ -203,13 +211,15 @@ window.addEventListener('load',(function(e){
 		}
 	}),false);
 	
-	document.getElementById('vm_name').addEventListener('click',(function(e){
-		click_count ++;
-		if (click_count >= 5) {
-			// show hidden functions...
-			document.getElementById('copy_vm_button').style.display = "block";
-			document.getElementById('delete_vm_button').style.display = "block";
-		}
+	document.getElementById('manage_vm_button').addEventListener('click',(function(e){
+		// show hidden functions...
+		document.getElementById('copy_vm_button').style.display = "block";
+		document.getElementById('delete_vm_button').style.display = "block";
+		document.getElementById('config_vm_button').style.display = "block";
+	}),false);
+
+	document.getElementById('config_vm_button').addEventListener('click',(function(e){
+	    location.href="configurevm.html#" + current_vmid;
 	}),false);
 	
 	load_vms();
@@ -238,8 +248,7 @@ window.addEventListener('hashchange',(function(e){
 	if (location.hash) {
 		var vmid = location.hash.slice(1);
 		if (vmid) {
-			load_vm_data(vmid);
-			load_vm_summary(vmid);
+			select_vm(vmid);
 		}
 	}
 }),false);

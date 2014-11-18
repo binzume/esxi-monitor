@@ -15,6 +15,7 @@
 
 <header>
 <ul class="menubar">
+<li>ESXi Monitor</li>
 <li><span id="login_user">...</span></li>
 <li><a href="javascript:disconnect()">Disconnect</a></li>
 </ul>
@@ -23,7 +24,7 @@
 
 <div>
 
-<h2>ESXi Monitor</h2>
+<h2>VM Status</h2>
 
 <div id="error">ERROR: Please try '<a href="javascript:disconnect()">Disconnect</a>' and 'Connect'.</div>
 
@@ -91,8 +92,10 @@ vmid: <span id="vm_id">--</span>
 
 
 <p>
-<button id="copy_vm_button" class="" style="_display:none;">Copy VM</button>
-<button id="delete_vm_button" class="careful" style="_display:none;">Delete VM</button>
+<button id="manage_vm_button" class="">ManageVM</button>
+<button id="config_vm_button" class="" style="display:none;">Configure VM</button>
+<button id="copy_vm_button" class="" style="display:none;">Copy VM</button>
+<button id="delete_vm_button" class="careful" style="display:none;">Delete VM</button>
 <button id="reboot_button" class="submit">Reboot</button>
 <button id="dlg_power_off_button" class="careful attach_right">Shutdown...</button><button id="power_on_button" class="">Power On</button>
 </p>
