@@ -38,8 +38,8 @@
  Nic Type:
  <form id="add_nic_form">
    <select id="nic_device">
-    <option value="vmxnet3">vmxnet3</option>
     <option value="e1000">E1000</option>
+    <option value="vmxnet3">vmxnet3</option>
    </select><br />
    <label><input id="nic_static_addr" type="checkbox" />static mac addr.</label><br />
    <input id="nic_macaddr" placeholder="MAC ADDR" type="text" value="00:50:56:XX:YY:ZZ" /><br />
@@ -52,7 +52,7 @@
 <fieldset class="group">
 <legend id="host_name">New VM</legend>
 
-<form action="/api/v1/vms/" method="POST">
+<form id="create_vm_form" action="/api/v1/vms/" method="POST">
 <input id="api_token" name="csrf_token" type="hidden" value=""/>
 
 <h3>Basic</h3>
@@ -67,13 +67,23 @@
 
 <h3>Network</h3>
 
+
+
 <ul class="simple" id="nic_list">
- <li>eth0 e1000</li>
+<li>
+[Eth0] device:
+<input name="nic_eth" type="hidden" value="0"/>
+<select name="nic_device">
+ <option value="e1000">E1000</option>
+ <option value="vmxnet3">vmxnet3</option>
+</select>
+MAC:<input name="nic_address" type="text" value="00:50:56:XX:YY:ZZ" />
+<label><input name="nic_static" type="checkbox" />Static addr.</label>
+</li>
 </ul>
 
-not supported yet.
+(Add NICs not supported yet.
 <button id="add_nic_button" disabled_>Add NIC</button>
-
 
 <h3>VNC</h3>
 

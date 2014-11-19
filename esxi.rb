@@ -101,6 +101,15 @@ class ESXi
     exec!('vim-cmd vmsvc/message' + vmid)
   end
 
+  def configure_vmx vmxpath, dev, params, clear_old = true
+    r = exec!("sed -i '/^#{dev}\\\./d' #{vmxpath}") if clear_old
+    params.map{|k,v|
+      "echo #{dev}.#{k} = \\\"#{v.to_s}\\\" >> #{vmxpath}"
+    }.each{|cmd|
+      exec!(cmd)
+    }
+  end
+
   def close
     @ssh.close if @ssh
     @ssh = nil

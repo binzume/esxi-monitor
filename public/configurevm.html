@@ -70,13 +70,28 @@ Please shutdown vm before configure...
 
 <h3>Network</h3>
 
+
+<form id="configure_nic_form" class="configure_vm_form" action="/api/v1/vms/:vmid/config/nic" method="POST">
+<input name="csrf_token" type="hidden" value=""/>
+
 <ul class="simple" id="nic_list">
- <li>eth0 e1000</li>
+<li>
+[Eth0] device:
+<input name="nic_eth" type="hidden" value="0"/>
+<select name="nic_device">
+ <option value="e1000">E1000</option>
+ <option value="vmxnet3">vmxnet3</option>
+</select>
+MAC:<input name="nic_address" type="text" value="00:50:56:XX:YY:ZZ" />
+<label><input name="nic_static" type="checkbox" />Static addr.</label>
+</li>
 </ul>
 
-not supported yet.
-<button id="add_nic_button" disabled_>Add NIC</button>
+<button id="vnc_config_button" class="submit">Apply!</button>
+</form>
 
+(Add NICs not supported yet.
+<button id="add_nic_button" disabled_>Add NIC</button>
 
 <h3>CD-ROM</h3>
 

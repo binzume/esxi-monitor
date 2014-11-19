@@ -163,20 +163,27 @@ class ESXiMonitorWeb < Sinatra::Base
       r = esxi.exec!("echo numvcpus = \"#{params['numvcpus']}\" >> #{vmxpath}")
     end
 
-    if true
-      r = esxi.exec!("echo ethernet0.present = \"TRUE\" >> #{vmxpath}")
-      r = esxi.exec!("echo ethernet0.virtualDev = \\\"e1000\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo ethernet0.features = \\\"15\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo ethernet0.networkName = \\\"VM Network\\\" >> #{vmxpath}")
-      ## ethernet0.addressType = "static"
-      ## ethernet0.address = "00:50:56:xx:xx:xx"
+    dev = 'ethernet' + (params['nic_eth'] || '0')
+    esxi.configure_vmx(vmxpath, dev, {
+      present: true,
+      virtualDev: params['nic_device'] || 'e1000',
+      features: '15',
+      networkName: params['nic_network_name'] || "VM Network"
+    })
+    if params['nic_static'] == 'on' && params['nic_address'] =~/^[0-9a-f:]+$/i
+      esxi.configure_vmx(vmxpath, dev, {
+        addressType: "static",
+        address: params['nic_address']
+      }, false)
     end
 
     if params['vnc_enable'] && params['vnc_enable'] == 'on'
-      r = esxi.exec!("echo RemoteDisplay.vnc.enabled = \\\"TRUE\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo RemoteDisplay.vnc.port = \\\"#{params['vnc_port']}\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo RemoteDisplay.vnc.password = \\\"#{params['vnc_passwd']}\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo RemoteDisplay.vnc.keyMap = \\\"jp\\\" >> #{vmxpath}")
+      esxi.configure_vmx(vmxpath, 'RemoteDisplay.vnc', {
+        enabled: true,
+        port: params['vnc_port'],
+        password: params['vnc_passwd'],
+        keyMap: "jp"
+      }, false)
     end
 
     if params['disk_size'] && params['disk_size'] =~ /^\d+\w*$/
@@ -197,6 +204,7 @@ class ESXiMonitorWeb < Sinatra::Base
   end
 
   get '/api/v1/esxi/datastore/isoimages' do
+    halt 403, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
 
     datastore = 'datastore1' # fixme!
     dir = '/vmfs/volumes/' + datastore + '/images'
@@ -208,7 +216,9 @@ class ESXiMonitorWeb < Sinatra::Base
     {:status => 'ok', :images => r.split(/\s+/)}.to_json
   end
 
-  post '/api/v1/vms/:vmid/config/cdrom' do
+  post '/api/v1/vms/:vmid/config/nic' do
+    halt 403, {:status => 'error', :message => 'bad token'}.to_json if request.env['HTTP_X_CSRFTOKEN'] != settings.token && params['csrf_token'] != settings.token
+    halt 403, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
 
     vmid = params[:vmid]
     esxi = ESXI.instance
@@ -220,17 +230,18 @@ class ESXiMonitorWeb < Sinatra::Base
       halt 503
     end
 
-    dev = 'ide1:0'
-    image = params['image']
-    connect = params['connect'] == 'on'
-
-    r = esxi.exec!("sed -i '/^#{dev}\\\./d' #{vmxpath}")
-    if image
-      r = esxi.exec!("echo #{dev}.present = \\\"TRUE\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo #{dev}.clientDevice = \\\"FALSE\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo #{dev}.startConnected = \\\"#{connect}\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo #{dev}.deviceType = \\\"cdrom-image\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo #{dev}.fileName = \\\"#{image}\\\" >> #{vmxpath}")
+    dev = 'ethernet' + (params['nic_eth'] || '0')
+    esxi.configure_vmx(vmxpath, dev, {
+      present: true,
+      virtualDev: params['nic_device'],
+      features: '15',
+      networkName: params['nic_network_name'] || "VM Network"
+    })
+    if params['nic_static'] == 'on' && params['nic_address'] =~/^[0-9a-f:]+$/i
+      esxi.configure_vmx(vmxpath, dev, {
+        addressType: "static",
+        address: params['nic_address']
+      }, false)
     end
 
     # reload vmx
@@ -240,7 +251,43 @@ class ESXiMonitorWeb < Sinatra::Base
     {:status => 'probably ok', :message => 'Please reboot a VM.'}.to_json
   end
 
+  post '/api/v1/vms/:vmid/config/cdrom' do
+    halt 403, {:status => 'error', :message => 'bad token'}.to_json if request.env['HTTP_X_CSRFTOKEN'] != settings.token && params['csrf_token'] != settings.token
+    halt 403, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
+
+    vmid = params[:vmid]
+    esxi = ESXI.instance
+    summary = esxi.summary(vmid)
+    if summary["config"]["vmPathName"] =~/\[([^\]]+)\]\s*(.+)/
+      vmxpath = "/vmfs/volumes/" + $1 + "/" + $2
+      vmdir = File.dirname(vmxpath)
+    else
+      halt 503
+    end
+
+    image = params['image']
+    connect = params['connect'] == 'on'
+
+    dev = 'ide1:0'
+    esxi.configure_vmx(vmxpath, dev, {
+      present: true,
+      clientDevice: false,
+      startConnected: connect,
+      deviceType: "cdrom-image",
+      fileName: connect ? image : ""
+    })
+
+    # reload vmx
+    r = esxi.exec!("vim-cmd vmsvc/reload #{vmid}")
+
+    content_type :json
+    {:status => 'probably ok', :message => 'Please reboot a VM.'}.to_json
+  end
+
   post '/api/v1/vms/:vmid/config/vnc' do
+    halt 403, {:status => 'error', :message => 'bad token'}.to_json if request.env['HTTP_X_CSRFTOKEN'] != settings.token && params['csrf_token'] != settings.token
+    halt 403, {:status => 'error', :message => 'Not login'}.to_json unless ESXI.instance
+    halt 400, {:status => 'error', :message => 'param error: vnc_passwd'}.to_json unless params['vnc_passwd'] && params['vnc_passwd'].length > 0
 
     vmid = params[:vmid]
     esxi = ESXI.instance
@@ -253,13 +300,15 @@ class ESXiMonitorWeb < Sinatra::Base
     end
 
     dev = 'RemoteDisplay.vnc'
-
-    r = esxi.exec!("sed -i '/^#{dev}\\\./d' #{vmxpath}")
     if params['vnc_enable'] && params['vnc_enable'] == 'on'
-      r = esxi.exec!("echo #{dev}.enabled = \\\"TRUE\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo #{dev}.port = \\\"#{params['vnc_port']}\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo #{dev}.password = \\\"#{params['vnc_passwd']}\\\" >> #{vmxpath}")
-      r = esxi.exec!("echo #{dev}.keyMap = \\\"jp\\\" >> #{vmxpath}")
+      esxi.configure_vmx(vmxpath, dev, {
+        enabled: true,
+        port: params['vnc_port'],
+        password: params['vnc_passwd'],
+        keyMap: "jp"
+      })
+    else
+      esxi.configure_vmx(vmxpath, dev, {})
     end
 
     # reload vmx

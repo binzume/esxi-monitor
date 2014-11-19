@@ -32,6 +32,10 @@ window.addEventListener('load',(function(e){
 			onClick('add_nic_button2',function(){
     		element_append(document.getElementById("nic_list"),element('li', "NIC " + 
     		document.getElementById("nic_device").value  + "(" + document.getElementById("nic_macaddr").value ));
+		    var form = document.getElementById("create_vm_form");
+		    form.nic_device.value = document.getElementById("nic_device").value;
+		    form.nic_static.value = document.getElementById("nic_static_addr").value;
+		    form.nic_address.value = document.getElementById("nic_macaddr").value;
 		}).show();
 		
 	}),false);
