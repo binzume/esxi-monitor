@@ -29,6 +29,23 @@ function getJson(url,f){
 	xhr.send();
 }
 
+function requestJson(method, url, f){
+	var xhr = getxhr();
+	xhr.open(method, url);
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState != 4) return;
+		if (f) {
+			if (xhr.status == 200) {
+				f(JSON.parse(xhr.responseText))
+			} else {
+				f(undefined)
+			}
+		}
+	};
+	return xhr;
+}
+
+
 function element_append(e, value) {
 	if (typeof value == 'string') {
 		value = document.createTextNode(value);

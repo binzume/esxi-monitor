@@ -31,9 +31,19 @@ function select_vm(vmid) {
 
 
 function power_ctl_vm(vmid, state) {
-	var xhr = getxhr();
-	xhr.open('POST', apiUrl + "vms/" + vmid + "/power");
-	xhr.setRequestHeader("X-CSRFToken", token);
+	document.getElementById('error').style.display = "none";
+	var r = document.getElementById('succeeded');
+	r.style.display = "none";
+	var xhr = requestJson('POST', apiUrl + "vms/" + vmid + "/power");
+	xhr.setRequestHeader("X-CSRFToken", token, function(result) {
+		ul.innerHTML = "";
+		if (result && result.status=='ok') {
+			r.innerHTML = "OK";
+			r.style.display = "block";
+		} else {
+			document.getElementById('error').style.display = "block";
+		}
+	});
 	xhr.send(state);
 }
 

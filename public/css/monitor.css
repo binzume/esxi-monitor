@@ -1,7 +1,7 @@
 
-
 header {
-	background-color: #cccccc;
+	background-color: #0099ff;
+	color: #000000;
 }
 
 
@@ -13,10 +13,19 @@ header {
 	color: red;
 }
 
-
 #error {
+	background-color: #ffdddd;
 	color:red;
 	display: none;
+	text-align: center;
+	padding: 4pt 0;
+}
+
+#succeeded {
+	background-color: #ddffdd;
+	display: none;
+	text-align: center;
+	padding: 4pt 0;
 }
 
 

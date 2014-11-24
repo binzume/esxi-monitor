@@ -14,6 +14,7 @@ ul.simple li {
 	list-style-type: none;
 	padding: 3px 10px;
 	margin: 0px;
+	line-height: 20pt;
 }
 ul.simple li:nth-child(2n) {
 	background-color: #fafafa;
@@ -30,6 +31,9 @@ ul.simple li:nth-child(2n):hover {
 ul.simple li:nth-child(2n+1):hover {
 	background-color: #f5f5dd;
 }
+ul.simple li.sel {
+	background-color: #ddeeff;
+}
 
 
 /* menulist */
@@ -43,7 +47,7 @@ ul.menubar li {
 	border-style:solid;
 	border-width: 0 1px 0 0;
 	border-color: #888;
-
+	line-height: 24pt;
 }
 ul.menubar li.sel {
 	color: white;

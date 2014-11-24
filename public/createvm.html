@@ -3,15 +3,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link rel=stylesheet type="text/css" href="css/form.css" />
 	<link rel=stylesheet type="text/css" href="css/list.css" />
-	<link rel=stylesheet type="text/css" href="css/layout_sidemenu.css" />
+	<link rel=stylesheet type="text/css" href="css/layout_fixedmenu.css" />
 	<link rel=stylesheet type="text/css" href="css/monitor.css" />
 	<title>ESXi Monitor</title>
 	<script src="js/lib.js"></script>
 	<script src="js/createvm.js"></script>
 </head>
 <body>
-
-<div id="content">
 
 <header>
 <ul class="menubar">
@@ -21,17 +19,21 @@
 </ul>
 </header>
 
+<div id="content">
 
-<div>
 
-<h2>CREATE VM(Experimental)</h2>
-
-<div id="error">ERROR: Please try '<a href="javascript:disconnect()">Disconnect</a>' and 'Connect'.</div>
-
+<div class="menu">
+<ul class="simple">
+ <li><a href="host.html">Host summary</a></li>
+ <li class="sel"><a href="createvm.html">Create New VM</a></li>
+ <li><a href="index.html">VMs</a></li>
+</ul>
 
 </div>
 
 <div class="main">
+
+<div id="error">ERROR: Please try '<a href="javascript:disconnect()">Disconnect</a>' and 'Connect'.</div>
 
 <div id="add_nic_dialog" class="dialog">
  <h3>NIC</h3>
@@ -49,6 +51,22 @@
 </div>
 
 
+<div id="select_os_dialog" class="dialog">
+ <h3>OS</h3>
+ <form id="select_os_form">
+   <select name="guestos">
+    <option value="otherlinux-64">other Linux64</option>
+    <option value="centos-64">CeontOS_64</option>
+    <option value="ubuntu-64">Ubuntu_64</option>
+    <option value="windows7-64">Windows7_64</option>
+    <option value="vmkernel">vmkernel</option>
+   </select>
+ </form>
+ <button id="select_os_form_ok" class="submit">OK</button>
+ <button class="dialog_cancel">Cancel</button>
+</div>
+
+
 <fieldset class="group">
 <legend id="host_name">New VM</legend>
 
@@ -62,7 +80,8 @@
  <li>CPU: <input name="numvcpus" type="text" size="10" value="1"/> Cores</li>
  <li>Mem: <input name="memsize" type="text" size="10" value="1024"/>MB</li>
  <li>Disk: <input name="disk_size" type="text" size="10" value="20G"/>B</li>
- <li>OS: <input name="guestos" type="text" size="10" value="otherlinux-64"/> fill valid vmware guestOS type.</li>
+ <li>OS: <input name="guestos" type="text" size="10" value="otherlinux-64"/><button id="select_os_button">...</button>
+ fill valid vmware guestOS type.</li>
 </ul>
 
 <h3>Network</h3>

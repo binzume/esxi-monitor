@@ -3,15 +3,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link rel=stylesheet type="text/css" href="css/form.css" />
 	<link rel=stylesheet type="text/css" href="css/list.css" />
-	<link rel=stylesheet type="text/css" href="css/layout_sidemenu.css" />
+	<link rel=stylesheet type="text/css" href="css/layout_fixedmenu.css" />
 	<link rel=stylesheet type="text/css" href="css/monitor.css" />
 	<title>ESXi Monitor</title>
 	<script src="js/lib.js"></script>
 	<script src="js/hostinfo.js"></script>
 </head>
 <body>
-
-<div id="content">
 
 <header>
 <ul class="menubar">
@@ -21,18 +19,21 @@
 </ul>
 </header>
 
+<div id="content">
 
-<div>
 
-<h2>ESXi Host</h2>
-
-<div id="error">ERROR: Please try '<a href="javascript:disconnect()">Disconnect</a>' and 'Connect'.</div>
-
+<div class="menu">
+<ul class="simple">
+ <li class="sel"><a href="host.html">Host summary</a></li>
+ <li><a href="createvm.html">Create New VM</a></li>
+ <li><a href="index.html">VMs</a></li>
+</ul>
 
 </div>
 
 <div class="main">
 
+<div id="error">ERROR: Please try '<a href="javascript:disconnect()">Disconnect</a>' and 'Connect'.</div>
 
 <fieldset class="group">
 <legend id="host_name">name</legend>

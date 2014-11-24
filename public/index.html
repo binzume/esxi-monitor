@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link rel=stylesheet type="text/css" href="css/form.css" />
 	<link rel=stylesheet type="text/css" href="css/list.css" />
-	<link rel=stylesheet type="text/css" href="css/layout_sidemenu.css" />
+	<link rel=stylesheet type="text/css" href="css/layout_fixedmenu.css" />
 	<link rel=stylesheet type="text/css" href="css/monitor.css" />
 	<title>ESXi Monitor</title>
 	<script src="js/lib.js"></script>
@@ -11,35 +11,24 @@
 </head>
 <body>
 
-<div id="content">
-
 <header>
 <ul class="menubar">
 <li>ESXi Monitor</li>
 <li><span id="login_user">...</span></li>
 <li><a href="javascript:disconnect()">Disconnect</a></li>
+<li><button id="refresh_button">Reload</button></li>
 </ul>
 </header>
 
+<div id="content">
 
-<div>
-
-<h2>VM Status</h2>
-
- <button id="refresh_button">Reload</button><br />
-
-<div id="error">ERROR: Please try '<a href="javascript:disconnect()">Disconnect</a>' and 'Connect'.</div>
-
-
-</div>
 
 <div class="menu">
 <ul class="simple">
  <li><a href="host.html">Host summary</a></li>
  <li><a href="createvm.html">Create New VM</a></li>
+ <li class="sel">VMs</li>
 </ul>
-
-VMs
 
 <ul class="simple" id="vm_list">
  <li>please reload</li>
@@ -49,6 +38,11 @@ VMs
 
 <div class="main">
 
+<div id="error">ERROR: Please try '<a href="javascript:disconnect()">Disconnect</a>' and 'Connect'.</div>
+
+<div id="succeeded"></div>
+
+<h2>VM Status</h2>
 
 
 <div id="power_off_dialog" class="dialog">

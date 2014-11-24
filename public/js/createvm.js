@@ -40,6 +40,17 @@ window.addEventListener('load',(function(e){
 		
 	}),false);
 
+	// select os
+	document.getElementById('select_os_button').addEventListener('click',(function(e){
+		e.preventDefault();
+		new Dialog(document.getElementById('select_os_dialog')).
+			onClick('select_os_form_ok',function(){
+		    var form = document.getElementById("create_vm_form");
+		    form.guestos.value = document.getElementById("select_os_form").guestos.value;
+		}).show();
+		
+	}),false);
+
 	check_connected(function(result){
 		token = result.token;
 		document.getElementById("api_token").value = result.token;
