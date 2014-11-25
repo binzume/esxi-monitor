@@ -34,9 +34,7 @@ function power_ctl_vm(vmid, state) {
 	document.getElementById('error').style.display = "none";
 	var r = document.getElementById('succeeded');
 	r.style.display = "none";
-	var xhr = requestJson('POST', apiUrl + "vms/" + vmid + "/power");
-	xhr.setRequestHeader("X-CSRFToken", token, function(result) {
-		ul.innerHTML = "";
+	var xhr = requestJson('POST', apiUrl + "vms/" + vmid + "/power", function(result) {
 		if (result && result.status=='ok') {
 			r.innerHTML = "OK";
 			r.style.display = "block";
@@ -44,6 +42,7 @@ function power_ctl_vm(vmid, state) {
 			document.getElementById('error').style.display = "block";
 		}
 	});
+	xhr.setRequestHeader("X-CSRFToken", token);
 	xhr.send(state);
 }
 

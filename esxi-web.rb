@@ -132,7 +132,7 @@ class ESXiMonitorWeb < Sinatra::Base
     end
 
     content_type :json
-    {:status => '?'}.to_json
+    {:status => 'ok'}.to_json
   end
 
   # new vm(experimental)
